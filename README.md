@@ -74,7 +74,7 @@ python run.py
 
 federation-website/
 ├── app/
-│   ├── models/          # Модели БД
+├─ ├── models/          # Модели БД
 │   ├── routes/          # Маршруты
 │   ├── templates/       # HTML шаблоны
 │   ├── static/          # CSS/JS/Изображения
