@@ -6,10 +6,22 @@
 
 bash
 # Установка
+# 1. Создание виртуального окружения
 python -m venv venv
-source venv/bin/activate  # Linux/MacOS
-venv\Scripts\activate     # Windows
+
+# 2. Активация виртуального окружения
+# Для Windows:
+venv\Scripts\activate
+
+# 3. Установка зависимостей
 pip install -r requirements.txt
+
+# 4. Настройка базы данных
+python init_db.py
+
+# 5. Запуск приложения
+python run.py
+
 
 # Инициализация БД
 python init_db.py
