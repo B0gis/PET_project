@@ -58,7 +58,7 @@ python run.py
 🛠 Технологии
 
 · Backend: Python + Flask
-· База данных: SQLite/PostgreSQL
+· База данных: SQLite
 · Frontend: HTML5, CSS3, JavaScript
 · UI: Bootstrap 5
 · Админка: Flask-Admin
