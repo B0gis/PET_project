@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+
+<div class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="mb-4">Добро пожаловать в Спортивную Федерацию</h1>
+                <p class="lead mb-4">Мы развиваем спорт высших достижений и пропагандируем здоровый образ жизни. Присоединяйтесь к нам!</p>
+                <a href="{{ url_for('about') }}" class="btn btn-light btn-lg">Узнать больше</a>
+            </div>
+            <div class="col-lg-6">
+                <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+                     alt="Спорт" class="img-fluid rounded shadow">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="container py-5">
+    <div class="row text-center">
+        <div class="col-md-3 col-6 mb-4">
+            <div class="stat-card">
+                <i class="fas fa-users fa-3x mb-3"></i>
+                <h3 class="fw-bold">{{ stats.coaches_count }}</h3>
+                <p>Тренеров</p>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-4">
+            <div class="stat-card">
+                <i class="fas fa-running fa-3x mb-3"></i>
+                <h3 class="fw-bold">{{ stats.sportsmen_count }}</h3>
+                <p>Спортсменов</p>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-4">
+            <div class="stat-card">
+                <i class="fas fa-calendar-alt fa-3x mb-3"></i>
+                <h3 class="fw-bold">{{ stats.trainings_count }}</h3>
+                <p>Тренировок в неделю</p>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-4">
+            <div class="stat-card">
+                <i class="fas fa-newspaper fa-3x mb-3"></i>
+                <h3 class="fw-bold">{{ stats.published_news_count }}</h3>
+                <p>Новостей</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="container py-5">
+    <h2 class="text-center mb-5">Последние новости</h2>
+    
+    {% if latest_news %}
+    <div class="row">
+        {% for item in latest_news %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                {% if item.thumbnail_path %}
+                <img src="{{ url_for('static', filename='uploads/' + item.thumbnail_path) }}" 
+                     class="card-img-top news-thumbnail" 
+                     alt="{{ item.title }}">
+                {% else %}
+                <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" 
+                     style="height: 200px;">
+                    <i class="fas fa-newspaper fa-3x text-white"></i>
+                </div>
+                {% endif %}
+                
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ item.title }}</h5>
+                    <p class="card-text flex-grow-1">
+                        {{ item.content[:150] }}...
+                    </p>
+                    <div class="text-muted small mb-2">
+                        <i class="far fa-calendar"></i> {{ item.created_at.strftime('%d.%m.%Y') }}
+                    </div>
+                    <a href="{{ url_for('news_detail', news_id=item.id) }}" 
+                       class="btn btn-primary mt-auto">
+                        Читать далее <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="text-center mt-4">
+        <a href="{{ url_for('news') }}" class="btn btn-primary btn-lg">
+            Все новости <i class="fas fa-arrow-right"></i>
+        </a>
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center">
+        <p class="mb-0">Новостей пока нет. Следите за обновлениями!</p>
+    </div>
+    {% endif %}
+</div>
+
+
+<div class="bg-light py-5">
+    <div class="container text-center">
+        <h2 class="mb-4">Хотите стать частью нашей команды?</h2>
+        <p class="lead mb-4">Присоединяйтесь к тренировкам или станьте тренером!</p>
+        <a href="{{ url_for('schedule') }}" class="btn btn-primary btn-lg me-3">
+            <i class="fas fa-calendar-check"></i> Посмотреть расписание
+        </a>
+        <a href="{{ url_for('about') }}" class="btn btn-outline-primary btn-lg">
+            <i class="fas fa-info-circle"></i> Контакты
+        </a>
+    </div>
+</div>
+{% endblock %}

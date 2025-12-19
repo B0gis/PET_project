@@ -1,0 +1,135 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Дашборд{% endblock %}
+{% block page_title %}Дашборд{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Тренеров
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.coaches_count }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Спортсменов
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.sportsmen_count }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-running fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Тренировок
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.trainings_count }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-calendar-alt fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            Новостей
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.news_count }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-newspaper fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h6 class="m-0 font-weight-bold">Быстрые действия</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('admin.add_news') }}" class="btn btn-success w-100">
+                            <i class="fas fa-plus"></i> Добавить новость
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('admin.add_coach') }}" class="btn btn-info w-100">
+                            <i class="fas fa-user-plus"></i> Добавить тренера
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('admin.add_sportsman') }}" class="btn btn-warning w-100">
+                            <i class="fas fa-running"></i> Добавить спортсмена
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('admin.add_training') }}" class="btn btn-primary w-100">
+                            <i class="fas fa-calendar-plus"></i> Добавить тренировку
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h6 class="m-0 font-weight-bold">Информация о системе</h6>
+            </div>
+            <div class="card-body">
+                <p>Добро пожаловать в админ панель Спортивной Федерации!</p>
+                <p>Здесь вы можете управлять всеми разделами сайта:</p>
+                <ul>
+                    <li><strong>Новости</strong> - добавление и редактирование новостей с изображениями</li>
+                    <li><strong>Тренеры</strong> - управление списком тренеров</li>
+                    <li><strong>Спортсмены</strong> - управление списком спортсменов</li>
+                    <li><strong>Расписание</strong> - управление расписанием тренировок</li>
+                </ul>
+                <p class="text-muted">Для перехода в нужный раздел используйте меню слева.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{% if training %}Редактировать тренировку{% else %}Добавить тренировку{% endif %}{% endblock %}
+{% block page_title %}{% if training %}Редактирование тренировки{% else %}Добавление тренировки{% endif %}{% endblock %}
+
+{% block content %}
+<div class="card shadow">
+    <div class="card-body">
+        <form method="POST">
+            <div class="mb-3">
+                <label for="day" class="form-label">День недели *</label>
+                <select class="form-control" id="day" name="day" required>
+                    <option value="">Выберите день</option>
+                    {% for day in days %}
+                    <option value="{{ day }}" 
+                            {% if training and training.day == day %}selected{% endif %}>
+                        {{ day }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="mb-3">
+                <label for="time" class="form-label">Время *</label>
+                <input type="time" class="form-control" id="time" name="time" 
+                       value="{{ training.time if training else '' }}" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="place" class="form-label">Место *</label>
+                <input type="text" class="form-control" id="place" name="place" 
+                       value="{{ training.place if training else '' }}" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="coach_id" class="form-label">Тренер *</label>
+                <select class="form-control" id="coach_id" name="coach_id" required>
+                    <option value="">Выберите тренера</option>
+                    {% for coach in coaches %}
+                    <option value="{{ coach.id }}" 
+                            {% if training and training.coach_id == coach.id %}selected{% endif %}>
+                        {{ coach.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="d-flex justify-content-between">
+                <a href="{{ url_for('admin.schedule_list') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Назад к списку
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> {% if training %}Сохранить изменения{% else %}Добавить тренировку{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

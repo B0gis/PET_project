@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}{{ news.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Главная</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('news') }}">Новости</a></li>
+            <li class="breadcrumb-item active">{{ news.title[:30] }}...</li>
+        </ol>
+    </nav>
+    
+    <article class="news-detail">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card">
+
+                    {% if news.images %}
+                    <div id="newsCarousel" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            {% for image in news.images|sort(attribute='order') %}
+                            <div class="carousel-item {% if loop.first %}active{% endif %}">
+                                <img src="{{ url_for('static', filename='uploads/' + image.image_path) }}"
+                                     class="d-block w-100 news-thumbnail"
+                                     alt="{{ news.title }} - изображение {{ loop.index }}"
+                                     style="max-height: 500px; object-fit: cover;">
+                                {% if news.images|length > 1 %}
+                                <div class="carousel-caption d-none d-md-block" style="background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px;">
+                                    <p>Изображение {{ loop.index }} из {{ news.images|length }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        {% if news.images|length > 1 %}
+                        <button class="carousel-control-prev" type="button" data-bs-target="#newsCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Предыдущее</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#newsCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Следующее</span>
+                        </button>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <div class="card-body">
+                        <h1 class="card-title">{{ news.title }}</h1>
+
+                        <div class="text-muted mb-4">
+                            <i class="far fa-calendar"></i>
+                            Опубликовано: {{ news.created_at.strftime('%d.%m.%Y %H:%M') }}
+                            {% if news.images %}
+                            <span class="ms-3">
+                                <i class="fas fa-images"></i>
+                                Изображений: {{ news.images|length }}
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="news-content">
+                            {{ news.content|safe }}
+                        </div>
+                    </div>
+
+                    <!-- Миниатюры всех изображений (галерея) -->
+                    {% if news.images and news.images|length > 1 %}
+                    <div class="card-footer">
+                        <h6 class="mb-3">Галерея изображений:</h6>
+                        <div class="row">
+                            {% for image in news.images|sort(attribute='order') %}
+                            <div class="col-4 col-md-3 col-lg-2 mb-2">
+                                <a href="#" class="gallery-thumb-link" data-bs-target="#newsCarousel" data-bs-slide-to="{{ loop.index0 }}">
+                                    <img src="{{ url_for('static', filename='uploads/' + image.thumbnail_path) }}"
+                                         class="img-thumbnail gallery-thumbnail {% if loop.first %}active-thumb{% endif %}"
+                                         alt="Миниатюра {{ loop.index }}"
+                                         style="width: 100%; height: 80px; object-fit: cover; cursor: pointer;">
+                                </a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="card-footer">
+                        <a href="{{ url_for('news') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Вернуться к новостям
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </article>
+</div>
+
+<style>
+.gallery-thumbnail {
+    transition: all 0.3s ease;
+    border-width: 2px;
+}
+.gallery-thumbnail:hover {
+    transform: scale(1.05);
+    border-color: #0d6efd !important;
+    opacity: 0.9;
+}
+.active-thumb {
+    border-color: #0d6efd !important;
+    border-width: 3px;
+}
+.gallery-thumb-link {
+    display: block;
+}
+</style>
+
+<script>
+// Подсветка активной миниатюры в галерее
+document.addEventListener('DOMContentLoaded', function() {
+    const carousel = document.getElementById('newsCarousel');
+    if (carousel) {
+        carousel.addEventListener('slide.bs.carousel', function(event) {
+            // Убираем активный класс у всех миниатюр
+            document.querySelectorAll('.gallery-thumbnail').forEach(thumb => {
+                thumb.classList.remove('active-thumb');
+            });
+
+            // Добавляем активный класс к соответствующей миниатюре
+            const activeIndex = event.to;
+            const thumbnail = document.querySelectorAll('.gallery-thumbnail')[activeIndex];
+            if (thumbnail) {
+                thumbnail.classList.add('active-thumb');
+            }
+        });
+    }
+
+    // Клик по миниатюре
+    document.querySelectorAll('.gallery-thumb-link').forEach((link, index) => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const carousel = new bootstrap.Carousel(document.getElementById('newsCarousel'));
+            carousel.to(index);
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{% if sportsman %}Редактировать спортсмена{% else %}Добавить спортсмена{% endif %}{% endblock %}
+{% block page_title %}{% if sportsman %}Редактирование спортсмена{% else %}Добавление спортсмена{% endif %}{% endblock %}
+
+{% block content %}
+<div class="card shadow">
+    <div class="card-body">
+        <form method="POST">
+            <div class="mb-3">
+                <label for="name" class="form-label">Имя *</label>
+                <input type="text" class="form-control" id="name" name="name" 
+                       value="{{ sportsman.name if sportsman else '' }}" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="rank" class="form-label">Разряд *</label>
+                <input type="text" class="form-control" id="rank" name="rank" 
+                       value="{{ sportsman.rank if sportsman else '' }}" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="weight" class="form-label">Вес (кг) *</label>
+                <input type="number" step="0.1" class="form-control" id="weight" name="weight" 
+                       value="{{ sportsman.weight if sportsman else '' }}" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="coach_id" class="form-label">Тренер *</label>
+                <select class="form-control" id="coach_id" name="coach_id" required>
+                    <option value="">Выберите тренера</option>
+                    {% for coach in coaches %}
+                    <option value="{{ coach.id }}" 
+                            {% if sportsman and sportsman.coach_id == coach.id %}selected{% endif %}>
+                        {{ coach.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="d-flex justify-content-between">
+                <a href="{{ url_for('admin.sportsmen_list') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Назад к списку
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> {% if sportsman %}Сохранить изменения{% else %}Добавить спортсмена{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Спортсмены{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center mb-5">Наши спортсмены</h1>
+    
+    {% if sportsmen %}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Имя</th>
+                        <th>Разряд</th>
+                        <th>Вес</th>
+                        <th>Тренер</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sportsman in sportsmen %}
+                    <tr>
+                        <td>{{ sportsman.name }}</td>
+                        <td>{{ sportsman.rank }}</td>
+                        <td>{{ sportsman.weight }} кг</td>
+                        <td>{{ sportsman.coach_name }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center">
+            <p>Информация о спортсменах скоро появится.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

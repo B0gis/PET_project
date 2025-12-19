@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Расписание{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center mb-5">Расписание тренировок</h1>
+    
+    {% if schedule %}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>День</th>
+                        <th>Время</th>
+                        <th>Место</th>
+                        <th>Тренер</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for training in schedule %}
+                    <tr>
+                        <td>{{ training.day }}</td>
+                        <td>{{ training.time }}</td>
+                        <td>{{ training.place }}</td>
+                        <td>{{ training.coach_name }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center">
+            <p>Расписание тренировок скоро появится.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

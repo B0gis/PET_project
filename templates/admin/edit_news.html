@@ -1,0 +1,240 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{% if news %}Редактировать новость{% else %}Добавить новость{% endif %}{% endblock %}
+{% block page_title %}{% if news %}Редактирование новости{% else %}Создание новости{% endif %}{% endblock %}
+
+{% block content %}
+<div class="card shadow">
+    <div class="card-body">
+        <form method="POST" enctype="multipart/form-data" id="newsForm">
+            <div class="mb-3">
+                <label for="title" class="form-label">Заголовок *</label>
+                <input type="text" class="form-control" id="title" name="title"
+                       value="{{ news.title if news else '' }}" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="content" class="form-label">Содержание *</label>
+                <textarea class="form-control" id="content" name="content"
+                          rows="10" required>{{ news.content if news else '' }}</textarea>
+                <small class="form-text text-muted">
+                    Поддерживается HTML разметка. Для переносов используйте &lt;br&gt;
+                </small>
+            </div>
+
+            <!-- Секция для загрузки изображений -->
+            <div class="mb-4">
+                <label class="form-label">Изображения (можно выбрать несколько)</label>
+                <input type="file" class="form-control" id="images" name="images"
+                       accept=".jpg,.jpeg,.png,.gif" multiple
+                       onchange="previewSelectedImages(event)">
+                <small class="form-text text-muted">
+                    • Выберите несколько файлов с помощью Ctrl+Click или Shift+Click<br>
+                    • Изображения будут автоматически приведены к формату 1920x1080<br>
+                    • Поддерживаются форматы: JPG, PNG, GIF<br>
+                    • Первое загруженное изображение станет главным
+                </small>
+
+                <!-- Предпросмотр выбранных изображений -->
+                <div id="imagePreview" class="row mt-3"></div>
+
+                <!-- Существующие изображения (только при редактировании) -->
+                {% if news and news.images %}
+                <div class="mt-4">
+                    <h6>Существующие изображения:</h6>
+                    <div class="row" id="existingImages">
+                        {% for image in news.images|sort(attribute='order') %}
+                        <div class="col-md-3 col-sm-4 mb-3 image-item" data-id="{{ image.id }}">
+                            <div class="card">
+                                <img src="{{ url_for('static', filename='uploads/' + image.image_path) }}"
+                                     class="card-img-top"
+                                     alt="Изображение {{ loop.index }}"
+                                     style="height: 150px; object-fit: cover;">
+                                <div class="card-body p-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio"
+                                               name="main_image"
+                                               value="{{ image.id }}"
+                                               id="main_{{ image.id }}"
+                                               {% if image.is_main %}checked{% endif %}>
+                                        <label class="form-check-label" for="main_{{ image.id }}">
+                                            Главное
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input delete-checkbox"
+                                               type="checkbox"
+                                               name="delete_images"
+                                               value="{{ image.id }}"
+                                               id="delete_{{ image.id }}">
+                                        <label class="form-check-label text-danger" for="delete_{{ image.id }}">
+                                            Удалить
+                                        </label>
+                                    </div>
+                                    <input type="hidden" name="order_{{ image.id }}"
+                                           value="{{ loop.index0 }}" class="order-input">
+                                    <div class="mt-1">
+                                        <small class="text-muted">Порядок: {{ loop.index }}</small>
+                                    </div>
+                                </div>
+                                <div class="card-footer p-2">
+                                    <button type="button" class="btn btn-sm btn-outline-primary move-up"
+                                            onclick="moveImageUp({{ image.id }})">
+                                        <i class="fas fa-arrow-up"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-primary move-down"
+                                            onclick="moveImageDown({{ image.id }})">
+                                        <i class="fas fa-arrow-down"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="is_published"
+                       name="is_published" {% if news and news.is_published or not news %}checked{% endif %}>
+                <label class="form-check-label" for="is_published">Опубликовать сразу</label>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a href="{{ url_for('admin.news_list') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Назад к списку
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> {% if news %}Сохранить изменения{% else %}Создать новость{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="alert alert-info mt-3">
+    <h6><i class="fas fa-lightbulb"></i> Подсказки:</h6>
+    <ul class="mb-0">
+        <li>Используйте HTML теги для форматирования текста</li>
+        <li>Для жирного текста: &lt;strong&gt;текст&lt;/strong&gt;</li>
+        <li>Для курсива: &lt;em&gt;текст&lt;/em&gt;</li>
+        <li>Для списка: &lt;ul&gt;&lt;li&gt;пункт&lt;/li&gt;&lt;/ul&gt;</li>
+        <li>Для ссылок: &lt;a href="URL"&gt;текст&lt;/a&gt;</li>
+        <li>Вы можете загрузить до 10 изображений для одной новости</li>
+        <li>Измените порядок изображений с помощью стрелок вверх/вниз</li>
+    </ul>
+</div>
+
+<!-- JavaScript для управления изображениями -->
+<script>
+function previewSelectedImages(event) {
+    const preview = document.getElementById('imagePreview');
+    preview.innerHTML = '';
+    const files = event.target.files;
+
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            const col = document.createElement('div');
+            col.className = 'col-md-3 col-sm-4 mb-3';
+
+            col.innerHTML = `
+                <div class="card">
+                    <img src="${e.target.result}"
+                         class="card-img-top"
+                         alt="Предпросмотр"
+                         style="height: 150px; object-fit: cover;">
+                    <div class="card-body p-2 text-center">
+                        <small class="text-muted">Новое изображение ${i + 1}</small>
+                    </div>
+                </div>
+            `;
+
+            preview.appendChild(col);
+        }
+
+        reader.readAsDataURL(file);
+    }
+}
+
+function moveImageUp(imageId) {
+    const items = document.querySelectorAll('.image-item');
+    const currentItem = document.querySelector(`[data-id="${imageId}"]`);
+    const currentIndex = Array.from(items).indexOf(currentItem);
+
+    if (currentIndex > 0) {
+        const prevItem = items[currentIndex - 1];
+        const prevOrder = parseInt(prevItem.querySelector('.order-input').value);
+        const currentOrder = parseInt(currentItem.querySelector('.order-input').value);
+
+        // Меняем значения order
+        currentItem.querySelector('.order-input').value = prevOrder;
+        prevItem.querySelector('.order-input').value = currentOrder;
+
+        // Меняем позиции в DOM
+        currentItem.parentNode.insertBefore(currentItem, prevItem);
+
+        // Обновляем порядковые номера
+        updateOrderNumbers();
+    }
+}
+
+function moveImageDown(imageId) {
+    const items = document.querySelectorAll('.image-item');
+    const currentItem = document.querySelector(`[data-id="${imageId}"]`);
+    const currentIndex = Array.from(items).indexOf(currentItem);
+
+    if (currentIndex < items.length - 1) {
+        const nextItem = items[currentIndex + 1];
+        const nextOrder = parseInt(nextItem.querySelector('.order-input').value);
+        const currentOrder = parseInt(currentItem.querySelector('.order-input').value);
+
+        // Меняем значения order
+        currentItem.querySelector('.order-input').value = nextOrder;
+        nextItem.querySelector('.order-input').value = currentOrder;
+
+        // Меняем позиции в DOM
+        nextItem.parentNode.insertBefore(nextItem, currentItem);
+
+        // Обновляем порядковые номера
+        updateOrderNumbers();
+    }
+}
+
+function updateOrderNumbers() {
+    const items = document.querySelectorAll('.image-item');
+    items.forEach((item, index) => {
+        const orderText = item.querySelector('small.text-muted');
+        if (orderText) {
+            orderText.textContent = `Порядок: ${index + 1}`;
+        }
+    });
+}
+
+// Предотвращаем выбор главного изображения, если оно отмечено для удаления
+document.querySelectorAll('.delete-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        if (this.checked) {
+            const radio = this.closest('.card-body').querySelector('input[type="radio"]');
+            radio.disabled = true;
+            radio.checked = false;
+        } else {
+            const radio = this.closest('.card-body').querySelector('input[type="radio"]');
+            radio.disabled = false;
+        }
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.delete-checkbox').forEach(checkbox => {
+        if (checkbox.checked) {
+            const radio = checkbox.closest('.card-body').querySelector('input[type="radio"]');
+            radio.disabled = true;
+        }
+    });
+});
+</script>
+{% endblock %}
